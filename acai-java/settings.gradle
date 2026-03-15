@@ -1,0 +1,14 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        mavenCentral()
+    }
+}
+
+rootProject.name = 'acai-java-sdk'
+include 'main'
+project(':main').projectDir = file('src/main')
+include 'demo'
+project(':demo').projectDir = file('src/demo')
+include 'test'
+project(':test').projectDir = file('src/test')

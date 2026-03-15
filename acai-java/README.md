@@ -1,0 +1,248 @@
+# Acai Java SDK
+
+The backend Java SDK for server-side event tracking — a rebranded fork of the [Amplitude Java SDK](https://github.com/amplitude/Amplitude-Java), pointing to your own custom ingestion server.
+
+---
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Configuration](#configuration)
+- [Sending Events](#sending-events)
+- [Batch Mode](#batch-mode)
+- [Custom Server URL](#custom-server-url)
+- [Callbacks](#callbacks)
+- [Middleware](#middleware)
+- [Server-Side Setup](#server-side-setup)
+- [License](#license)
+
+---
+
+## Installation
+
+### Gradle
+
+Add the local JAR (or publish to your internal Maven repo) and include in `build.gradle`:
+
+```gradle
+dependencies {
+    implementation 'com.acai:acai-java-sdk:1.0.0'
+}
+```
+
+### Maven
+
+```xml
+<dependency>
+    <groupId>com.acai</groupId>
+    <artifactId>acai-java-sdk</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
+### Build from Source
+
+```bash
+git clone https://github.com/your-org/Acai-Java.git
+cd Acai-Java
+./gradlew build
+```
+
+---
+
+## Quick Start
+
+```java
+import com.acai.Acai;
+import com.acai.Event;
+
+// 1. Initialize with your API key
+Acai client = Acai.getInstance();
+client.init("YOUR_API_KEY");
+
+// 2. (Optional) Point to your custom server
+client.setServerUrl("https://your-acai-server.com/2/httpapi");
+
+// 3. Log an event
+Event event = new Event("button_clicked", "user-12345");
+client.logEvent(event);
+
+// 4. Flush all pending events before shutdown
+client.flushEvents();
+client.shutdown();
+```
+
+---
+
+## Configuration
+
+| Method | Description | Default |
+|--------|-------------|---------|
+| `client.init(apiKey)` | Set API key (required) | — |
+| `client.setServerUrl(url)` | Override the ingestion endpoint | `https://your-acai-server.com/2/httpapi` |
+| `client.useBatchMode(true)` | Switch to batch ingestion endpoint | `false` |
+| `client.setEventUploadThreshold(n)` | Flush when this many events are queued | `10` |
+| `client.setEventUploadPeriodMillis(ms)` | Flush every N milliseconds | `10000` |
+| `client.setLogMode(AcaiLog.LogMode.DEBUG)` | Control SDK log verbosity | `ERROR` |
+| `client.setFlushTimeout(ms)` | Max time to wait on flush threads | — |
+
+---
+
+## Sending Events
+
+### Minimal Event
+
+```java
+Event event = new Event("page_view", "user-abc");
+client.logEvent(event);
+```
+
+### Rich Event with Properties
+
+```java
+import org.json.JSONObject;
+
+Event event = new Event("purchase_completed", "user-abc");
+event.deviceId = "device-xyz";
+event.eventProperties = new JSONObject()
+    .put("item", "Pro Plan")
+    .put("price", 99.0)
+    .put("currency", "USD");
+event.userProperties = new JSONObject()
+    .put("plan", "trial");
+event.time = System.currentTimeMillis();
+
+client.logEvent(event);
+```
+
+### Event with Per-Event Callback
+
+```java
+import com.acai.AcaiCallbacks;
+
+client.logEvent(event, new AcaiCallbacks() {
+    @Override
+    public void onLogEventServerResponse(Event event, int status, String message) {
+        System.out.println("Event sent, status: " + status);
+    }
+});
+```
+
+---
+
+## Batch Mode
+
+Use the batch endpoint for high-volume, non-latency-sensitive workloads:
+
+```java
+client.useBatchMode(true);
+// Override the batch URL if using a custom server:
+client.setServerUrl("https://your-acai-server.com/batch");
+```
+
+---
+
+## Custom Server URL
+
+This SDK is designed to talk to **your own ingestion server**, not the original Amplitude servers. Set your endpoint after `init`:
+
+```java
+Acai client = Acai.getInstance();
+client.init("YOUR_API_KEY");
+client.setServerUrl("https://events.your-domain.com/2/httpapi");
+```
+
+Your server must accept the same JSON payload format as the Amplitude HTTP V2 API. See [Server-Side Setup](#server-side-setup) for details.
+
+---
+
+## Middleware
+
+Middleware lets you intercept, enrich, or filter events before they are sent:
+
+```java
+import com.acai.Middleware;
+import com.acai.MiddlewareNext;
+import com.acai.MiddlewarePayload;
+
+client.addEventMiddleware(new Middleware() {
+    @Override
+    public void run(MiddlewarePayload payload, MiddlewareNext next) {
+        // Enrich: add a common property to every event
+        payload.event.eventProperties.put("sdk_version", "1.0.0");
+        next.run(payload); // call next to continue; omit to drop the event
+    }
+});
+```
+
+---
+
+## Server-Side Setup
+
+Your custom ingestion server needs to expose two endpoints that accept the standard Amplitude HTTP V2 payload:
+
+### Endpoint: `POST /2/httpapi`
+
+**Expected JSON body:**
+
+```json
+{
+  "api_key": "YOUR_API_KEY",
+  "events": [
+    {
+      "event_type": "button_clicked",
+      "user_id": "user-12345",
+      "device_id": "device-xyz",
+      "time": 1700000000000,
+      "event_properties": {
+        "color": "blue"
+      },
+      "user_properties": {
+        "plan": "pro"
+      }
+    }
+  ]
+}
+```
+
+**Expected response:**
+
+| Status | Body | Meaning |
+|--------|------|---------|
+| `200` | `{"code": 200}` | Success |
+| `400` | `{"code": 400, "error": "..."}` | Bad request |
+| `413` | `{"code": 413}` | Payload too large |
+| `429` | `{"code": 429}` | Rate limited |
+| `500+` | — | Server error (SDK will retry) |
+
+### Endpoint: `POST /batch` (optional, for batch mode)
+
+Same payload format. The SDK retries on 5xx and 429 responses using exponential backoff.
+
+### Minimal Express.js Server Example
+
+```javascript
+const express = require('express');
+const app = express();
+app.use(express.json());
+
+app.post('/2/httpapi', (req, res) => {
+  const { api_key, events } = req.body;
+  if (!api_key || api_key !== process.env.EXPECTED_API_KEY) {
+    return res.status(400).json({ code: 400, error: 'Invalid API key' });
+  }
+  console.log(`Received ${events.length} event(s):`);
+  events.forEach(e => console.log(' -', e.event_type, 'from', e.user_id));
+  // TODO: store events in your database
+  res.json({ code: 200 });
+});
+
+app.listen(3000, () => console.log('Acai ingestion server running on :3000'));
+```
+
+---
+
+## License
+
+MIT License — see [LICENSE](LICENSE).

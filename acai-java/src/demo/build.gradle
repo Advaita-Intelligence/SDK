@@ -1,0 +1,51 @@
+plugins {
+    id "application"
+    id 'org.springframework.boot' version '2.4.4'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
+}
+
+apply plugin: 'idea'
+apply plugin: 'java'
+
+group 'com.amplitude'
+
+repositories {
+    jcenter()
+    mavenCentral()
+    maven {
+        url "https://plugins.gradle.org/m2/"
+    }
+}
+
+idea {
+    module {
+        sourceDirs += file('java')
+    }
+}
+
+sourceSets.main.java.srcDirs = ['java']
+
+dependencies {
+    implementation 'org.json:json:20231013'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation project(':main')
+}
+
+application {
+    mainClassName = "com.amplitude.Demo"
+}
+
+task runWithJavaExec(type: JavaExec) {
+    group = "Execution"
+    description = "Run the main class with JavaExecTask"
+    classpath = sourceSets.main.runtimeClasspath
+    main = "com.amplitude.Demo"
+}
+
+task runLocalUploadDemo(type: JavaExec) {
+    group = "Execution"
+    description = "Run LocalUploadDemo"
+    classpath = sourceSets.main.runtimeClasspath
+    main = "com.demo.amplitude.LocalUploadDemo"
+}
