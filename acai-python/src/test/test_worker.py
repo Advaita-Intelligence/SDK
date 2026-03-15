@@ -1,0 +1,322 @@
+import time
+import unittest
+from collections import defaultdict
+import random
+from threading import Thread
+from unittest.mock import MagicMock
+
+from acai import Config, BaseEvent
+from acai.storage import InMemoryStorage
+from acai.worker import Workers
+from acai.http_client import HttpClient, Response, HttpStatus
+
+
+class AcaiWorkersTestCase(unittest.TestCase):
+
+    def setUp(self) -> None:
+        self.workers = Workers()
+        self.workers.setup(Config(), InMemoryStorage())
+        self.workers.storage.setup(self.workers.configuration, self.workers)
+        self.events_dict = defaultdict(set)
+
+        def callback_func(event, code, message=None):
+            self.events_dict[code].add(event)
+
+        self.workers.configuration.callback = callback_func
+
+    def tearDown(self) -> None:
+        with self.workers.storage.lock:
+            self.workers.storage.lock.notify()
+
+    def test_worker_initialize_setup_success(self):
+        self.assertTrue(self.workers.is_active)
+        self.assertFalse(self.workers.is_started)
+        self.assertIsNotNone(self.workers.storage)
+        self.assertIsNotNone(self.workers.configuration)
+        self.assertIsNotNone(self.workers.threads_pool)
+        self.assertIsNotNone(self.workers.consumer_lock)
+        self.assertIsNotNone(self.workers.response_processor)
+
+    def test_worker_stop_success(self):
+        for i in range(5):
+            self.workers.storage.push(BaseEvent(f"event_{i}", "test_user"))
+
+        success_response = Response(HttpStatus.SUCCESS)
+        HttpClient.post = MagicMock(return_value=success_response)
+
+        self.workers.stop()
+        self.assertFalse(self.workers.is_active)
+        self.assertTrue(self.workers.is_started)
+
+        # Verify storage was flushed (all events removed)
+        self.assertEqual(0, self.workers.storage.total_events)
+        self.assertEqual(0, len(self.workers.storage.ready_queue))
+        self.assertEqual(0, len(self.workers.storage.buffer_data))
+
+    def test_worker_get_payload_success(self):
+        events = [BaseEvent("test_event1", "test_user"), BaseEvent("test_event2", "test_user")]
+        self.workers.configuration.api_key = "TEST_API_KEY"
+        expect_payload = b'{"api_key": "TEST_API_KEY", "events": [{"event_type": "test_event1", "user_id": ' \
+                         b'"test_user"}, {"event_type": "test_event2", "user_id": "test_user"}]}'
+        self.assertEqual(expect_payload, self.workers.get_payload(events))
+        self.workers.configuration.min_id_length = 3
+        expect_payload = b'{"api_key": "TEST_API_KEY", "events": [{"event_type": "test_event1", "user_id": ' \
+                         b'"test_user"}, {"event_type": "test_event2", "user_id": "test_user"}], "options": {' \
+                         b'"min_id_length": 3}}'
+        self.assertEqual(expect_payload, self.workers.get_payload(events))
+
+    def test_worker_consume_storage_events_success(self):
+        success_response = Response(HttpStatus.SUCCESS)
+        HttpClient.post = MagicMock()
+        HttpClient.post.return_value = success_response
+        self.workers.configuration.flush_interval_millis = 10
+        self.push_event(self.get_events_list(50))
+        self.assertTrue(self.workers.is_started)
+        time.sleep(self.workers.configuration.flush_interval_millis / 1000 + 1)
+        self.assertEqual(50, len(self.events_dict[200]))
+        self.assertFalse(self.workers.is_started)
+        self.push_event(self.get_events_list(50))
+        self.assertTrue(self.workers.is_started)
+        HttpClient.post.assert_called()
+
+    def test_worker_flush_events_in_storage_success(self):
+        success_response = Response(HttpStatus.SUCCESS)
+        HttpClient.post = MagicMock()
+        HttpClient.post.return_value = success_response
+        self.push_event(self.get_events_list(50))
+        self.workers.flush().result()
+        self.assertEqual(50, len(self.events_dict[200]))
+        HttpClient.post.assert_called()
+
+    def test_worker_send_events_with_success_response_trigger_callback(self):
+        events = self.get_events_list(100)
+        success_response = Response(HttpStatus.SUCCESS)
+        HttpClient.post = MagicMock()
+        HttpClient.post.return_value = success_response
+        self.workers.send(events)
+        self.assertEqual(self.events_dict[200], set(events))
+
+    def test_worker_send_events_with_invalid_request_response_trigger_callback(self):
+        events = self.get_events_list(100)
+        success_response = Response(HttpStatus.SUCCESS)
+        invalid_response = Response(HttpStatus.INVALID_REQUEST)
+        invalid_response.body = {
+            "code": 400,
+            "error": "Test error",
+            "events_with_invalid_fields": {
+                "time": [0, 1, 2, 3, 4, 5]
+            },
+            "events_with_missing_fields": {
+                "event_type": [5, 6, 7, 8, 9]
+            },
+            "events_with_invalid_id_lengths": {
+                "user_id": [10, 11, 12],
+                "device_id": [13, 14, 15]
+            },
+            "silenced_events": [16, 17, 18, 19]
+        }
+        HttpClient.post = MagicMock()
+        HttpClient.post.side_effect = [invalid_response, success_response]
+        self.workers.send(events)
+        self.workers.flush().result()
+        self.assertEqual(self.events_dict[200], set(events[20:]))
+        for i in range(20, 100):
+            self.assertEqual(1, events[i].retry)
+        self.assertEqual(self.events_dict[400], set(events[:20]))
+        self.assertEqual(2, HttpClient.post.call_count)
+
+    def test_worker_send_events_with_invalid_response_missing_field_no_retry(self):
+        events = self.get_events_list(100)
+        invalid_response = Response(HttpStatus.INVALID_REQUEST)
+        invalid_response.body = {
+            "code": 400,
+            "error": "Test error",
+            "missing_field": "api_key"
+        }
+        HttpClient.post = MagicMock()
+        HttpClient.post.return_value = invalid_response
+        self.workers.send(events)
+        self.assertEqual(100, len(self.events_dict[400]))
+        for e in events:
+            self.assertEqual(0, e.retry)
+
+    def test_worker_send_events_with_invalid_response_raise_api_key_error_no_callback(self):
+        events = self.get_events_list(100)
+        invalid_response = Response(HttpStatus.INVALID_REQUEST)
+        invalid_response.body = {
+            "code": 400,
+            "error": "Invalid API key: TEST_API_KEY"
+        }
+        HttpClient.post = MagicMock()
+        HttpClient.post.return_value = invalid_response
+        with self.assertLogs(None, "ERROR") as cm:
+            self.workers.send(events)
+            self.assertEqual(0, len(self.events_dict[400]))
+            self.assertEqual(["ERROR:amplitude:Invalid API Key"], cm.output)
+
+    def test_worker_send_events_with_payload_too_large_response_decrease_flush_queue_size(self):
+        events = self.get_events_list(30)
+        success_response = Response(HttpStatus.SUCCESS)
+        payload_too_large_response = Response(HttpStatus.PAYLOAD_TOO_LARGE)
+        HttpClient.post = MagicMock()
+        # First send gets PAYLOAD_TOO_LARGE (divider 1→2, size 30→15)
+        # First flush sends 2 batches of 15:
+        #   - Batch 1 (15) fails: len(15) <= 15 → TRUE → increase (divider 2→3, size 15→10)
+        #   - Batch 2 (15) fails: len(15) <= 10 → FALSE → don't increase
+        # Second flush sends 3 batches of 10, all succeed
+        HttpClient.post.side_effect = [
+            payload_too_large_response,  # Initial send of 30 events
+            payload_too_large_response,  # First flush batch 1 (15 events)
+            payload_too_large_response,  # First flush batch 2 (15 events)
+            success_response,  # Second flush batch 1 (10 events)
+            success_response,  # Second flush batch 2 (10 events)
+            success_response   # Second flush batch 3 (10 events)
+        ]
+        self.workers.configuration.flush_queue_size = 30
+        self.workers.send(events)
+        self.assertEqual(15, self.workers.configuration.flush_queue_size)
+        self.workers.flush().result()
+        # After first flush, only first batch increased divider (15 <= 15)
+        # Second batch didn't (15 > 10), so divider only went 2→3
+        self.assertEqual(10, self.workers.configuration.flush_queue_size)
+        self.workers.flush().result()
+        self.assertEqual(30, len(self.events_dict[200]))
+
+    def test_worker_send_events_with_timeout_and_failed_response_retry_all_events(self):
+        events = self.get_events_list(100)
+        success_response = Response(HttpStatus.SUCCESS)
+        failed_response = Response(HttpStatus.FAILED)
+        timeout_response = Response(HttpStatus.TIMEOUT)
+        HttpClient.post = MagicMock()
+        HttpClient.post.side_effect = [timeout_response, failed_response, success_response]
+        self.workers.send(events)
+        self.workers.flush().result()
+        self.workers.flush().result()
+        self.assertEqual(100, len(self.events_dict[200]))
+        self.assertEqual(3, HttpClient.post.call_count)
+
+    def test_worker_send_events_with_unknown_error_retry_all_events(self):
+        events = self.get_events_list(100)
+        success_response = Response(HttpStatus.SUCCESS)
+        unknown_error_response = Response(HttpStatus.UNKNOWN)
+        HttpClient.post = MagicMock()
+        HttpClient.post.side_effect = [unknown_error_response, success_response]
+        self.workers.send(events)
+        self.assertEqual(0, len(self.events_dict[-1]))
+        self.assertEqual(0, len(self.events_dict[200]))
+        self.workers.flush().result()
+        self.assertEqual(100, len(self.events_dict[200]))
+        self.assertEqual(2, HttpClient.post.call_count)
+        for event in events:
+            self.assertEqual(1, event.retry)
+
+    def test_worker_send_events_with_too_many_requests_response_callback_and_retry(self):
+        success_response = Response(HttpStatus.SUCCESS)
+        too_many_requests_response = Response(HttpStatus.TOO_MANY_REQUESTS, body={
+            "code": 429,
+            "error": "Too many requests for some devices and users",
+            "eps_threshold": 10,
+            "throttled_devices": {"test_throttled_device": 11},
+            "throttled_users": {"test_throttled_user": 12},
+            "exceeded_daily_quota_users": {"test_throttled_user2": 500200},
+            "exceeded_daily_quota_devices": {"test_throttled_device2": 600200},
+            "throttled_events": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+        })
+        events = self.get_events_list(100)
+        events[0].user_id = "test_throttled_user2"
+        events[1].device_id = "test_throttled_device2"
+        HttpClient.post = MagicMock()
+        HttpClient.post.side_effect = [too_many_requests_response, success_response, success_response]
+        self.workers.send(events)
+        self.assertEqual(self.events_dict[429], set(events[:2]))
+        i = -1
+        while i > -15:
+            self.assertEqual(events[16 + i], self.workers.storage.buffer_data[i][1])
+            i -= 1
+        self.workers.flush().result()
+        self.assertEqual(self.events_dict[200], set(events[2:]))
+
+    def test_worker_multithreading_process_events_with_random_response_success(self):
+        success_response = Response(HttpStatus.SUCCESS)
+        timeout_response = Response(HttpStatus.TIMEOUT)
+        unknown_error_response = Response(HttpStatus.UNKNOWN)
+        too_many_requests_response = Response(HttpStatus.TOO_MANY_REQUESTS, body={
+            "code": 429,
+            "error": "Too many requests for some devices and users",
+            "eps_threshold": 10,
+            "exceeded_daily_quota_users": {"test_user": 500200},
+            "throttled_events": [0]
+        })
+        failed_response = Response(HttpStatus.FAILED)
+        payload_too_large_response = Response(HttpStatus.PAYLOAD_TOO_LARGE)
+        invalid_response = Response(HttpStatus.INVALID_REQUEST, body={
+            "code": 400,
+            "error": "Test error",
+            "events_with_invalid_fields": {
+                "time": [0]
+            }
+        })
+
+        def dummy_post(url, payload, header=None):
+            i = random.randint(0, 100)
+            if i <= 2:
+                return timeout_response
+            if i <= 5:
+                return unknown_error_response
+            if i <= 8:
+                return too_many_requests_response
+            if i <= 11:
+                return failed_response
+            if i <= 14:
+                return payload_too_large_response
+            if i <= 17:
+                return invalid_response
+            return success_response
+
+        HttpClient.post = dummy_post
+        for target_func in [self.workers.send, self.push_event]:
+            with self.subTest(target_func=target_func):
+                threads = []
+                self.events_dict.clear()
+                for _ in range(50):
+                    t = Thread(target=target_func, args=(self.get_events_list(100),))
+                    threads.append(t)
+                    t.start()
+                for t in threads:
+                    t.join()
+                self.wait_for_workers_idle()
+                total_events = sum([len(self.events_dict[s]) for s in self.events_dict])
+                self.assertEqual(0, self.workers.storage.total_events)
+                self.assertEqual(5000, total_events)
+
+    def push_event(self, events):
+        for event in events:
+            self.workers.storage.push(event)
+
+    def wait_for_workers_idle(self, timeout=30):
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            flush_future = self.workers.flush()
+            if flush_future:
+                flush_future.result()
+            # Ensure currently queued thread pool work is complete.
+            self.workers.threads_pool.submit(lambda: None).result()
+            if self.workers.storage.total_events == 0:
+                if not self.workers.is_started:
+                    return
+                # Wake the sleeping consumer so is_started can flip to False promptly.
+                with self.workers.storage.lock:
+                    self.workers.storage.lock.notify()
+            time.sleep(0.1)
+        self.fail("Timed out waiting for workers to process all queued events")
+
+    @staticmethod
+    def get_events_list(n):
+        events = []
+        for i in range(n):
+            events.append(BaseEvent("test_event_" + str(i), "test_user"))
+        return events
+
+
+if __name__ == '__main__':
+    unittest.main()

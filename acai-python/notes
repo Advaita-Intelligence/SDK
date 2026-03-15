@@ -1,0 +1,76 @@
+Here's your **Acai Python SDK** — a fully rebranded fork of Amplitude-Python. Here's a complete walkthrough of what was done and how others can use it:
+
+---
+
+## What Was Changed
+
+| Area | Change |
+|---|---|
+| `src/amplitude/` | Renamed to `src/acai/` |
+| All `from amplitude` / `import amplitude` | Replaced with `acai` |
+| `SDK_LIBRARY` | Changed to `"acai-python"` |
+| `LOGGER_NAME` | Changed to `"acai"` |
+| Server URLs | Changed to `api.acai.io` / `api.eu.acai.io` (your domain) |
+| `setup.py` | Package name → `acai-analytics`, author → Acai Inc. |
+| `README.md` | Fully rewritten with Acai branding and custom server docs |
+
+---
+
+## Steps for Users to Capture Events
+
+### 1. Install the SDK
+```bash
+pip install acai-analytics
+# or from source:
+pip install -e ./acai-python
+```
+
+### 2. Initialize with your server
+```python
+from acai.client import Acai
+from acai.event import BaseEvent
+
+client = Acai(
+    api_key="YOUR_API_KEY",
+    server_url="https://your-acai-server.com/2/httpapi"  # ← your server
+)
+```
+
+### 3. Track events
+```python
+client.track(
+    BaseEvent(
+        event_type="button_click",
+        user_id="user@example.com",
+        event_properties={"page": "home"}
+    )
+)
+client.shutdown()
+```
+
+---
+
+## What Your Server Must Accept
+
+Your custom server needs to handle **POST** requests like this:
+
+```json
+{
+  "api_key": "YOUR_API_KEY",
+  "events": [
+    {
+      "event_type": "button_click",
+      "user_id": "user@example.com",
+      "time": 1700000000000,
+      "event_properties": { "page": "home" }
+    }
+  ]
+}
+```
+
+And respond with:
+```json
+{ "code": 200 }
+```
+
+> **Next step:** Push `acai-python.zip` to a new GitHub repo at `your-org/acai-python`, then update the URLs in `setup.py` and `README.md` to match. You can also publish to PyPI as `acai-analytics`.
