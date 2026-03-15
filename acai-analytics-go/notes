@@ -1,0 +1,62 @@
+Now I have a good understanding of the codebase. Let me do the full rebranding:Good. Now let me update the examples and create the README:Here's everything that was done and how to use it:
+
+---
+
+## What Changed
+
+The full `analytics-go` repo was cloned and rebranded:
+
+| Before | After |
+|--------|-------|
+| `github.com/amplitude/analytics-go` | `github.com/acai/analytics-go` |
+| `amplitude/` package directory | `acai/` package directory |
+| `amplitude_plugin.go`, `amplitude_http_client.go`, etc. | `acai_plugin.go`, `acai_http_client.go`, etc. |
+| Amplitude server URLs | Your configurable `ServerURL` |
+| All struct/type names (`AmplitudePlugin`, etc.) | `AcaiPlugin`, `AcaiHTTPClient`, etc. |
+
+---
+
+## Steps to Publish & Use the SDK
+
+### 1. Push to GitHub
+```bash
+tar -xzf acai-analytics-go.tar.gz
+cd acai-analytics-go
+git init
+git remote add origin https://github.com/YOUR-ORG/analytics-go
+git add . && git commit -m "Initial Acai SDK"
+git push -u origin main
+git tag v1.3.0 && git push --tags
+```
+
+### 2. Users install your SDK
+```bash
+go get github.com/YOUR-ORG/analytics-go
+```
+> Update `go.mod` to `module github.com/YOUR-ORG/analytics-go` before publishing.
+
+### 3. Users point to your server
+```go
+import "github.com/YOUR-ORG/analytics-go/acai"
+
+config := acai.NewConfig("YOUR-API-KEY")
+config.ServerURL = "https://your-acai-server.com/2/httpapi"  // ← your server
+
+client := acai.NewClient(config)
+defer client.Shutdown()
+
+client.Track(acai.Event{
+    EventType: "Button Clicked",
+    UserID:    "user-123",
+})
+```
+
+### 4. Your server must accept this JSON payload
+```json
+POST /2/httpapi
+{
+  "api_key": "...",
+  "events": [{ "event_type": "...", "user_id": "...", "time": 1700000000000 }]
+}
+```
+Respond with `{"code": 200}` and status 200. The README has a minimal Go server example to get you started.
