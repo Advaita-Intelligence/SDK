@@ -1,0 +1,69 @@
+export default {
+  DEFAULT_INSTANCE: '$default_instance',
+  API_VERSION: 2,
+  MAX_STRING_LENGTH: 4096,
+  MAX_PROPERTY_KEYS: 1000,
+  IDENTIFY_EVENT: '$identify',
+  GROUP_IDENTIFY_EVENT: '$groupidentify',
+  EVENT_LOG_URL: 'api.acai.yourdomain.com',
+  EVENT_LOG_EU_URL: 'api.eu.acai.yourdomain.com',
+  DYNAMIC_CONFIG_URL: 'config.acai.yourdomain.com',
+  DYNAMIC_CONFIG_EU_URL: 'config.eu.acai.yourdomain.com',
+
+  // localStorageKeys
+  LAST_EVENT_ID: 'acai_lastEventId',
+  LAST_EVENT_TIME: 'acai_lastEventTime',
+  LAST_IDENTIFY_ID: 'acai_lastIdentifyId',
+  LAST_SEQUENCE_NUMBER: 'acai_lastSequenceNumber',
+  SESSION_ID: 'acai_sessionId',
+
+  // Used in cookie as well
+  DEVICE_ID: 'acai_deviceId',
+  OPT_OUT: 'acai_optOut',
+  USER_ID: 'acai_userId',
+
+  // indexes of properties in cookie v2 storage format
+  DEVICE_ID_INDEX: 0,
+  USER_ID_INDEX: 1,
+  OPT_OUT_INDEX: 2,
+  SESSION_ID_INDEX: 3,
+  LAST_EVENT_TIME_INDEX: 4,
+  EVENT_ID_INDEX: 5,
+  IDENTIFY_ID_INDEX: 6,
+  SEQUENCE_NUMBER_INDEX: 7,
+
+  COOKIE_TEST_PREFIX: 'acai_cookie_test',
+  COOKIE_PREFIX: 'acai',
+
+  // Storage options
+  STORAGE_DEFAULT: '',
+  STORAGE_COOKIES: 'cookies',
+  STORAGE_NONE: 'none',
+  STORAGE_LOCAL: 'localStorage',
+  STORAGE_SESSION: 'sessionStorage',
+
+  // revenue keys
+  REVENUE_EVENT: 'revenue_amount',
+  REVENUE_PRODUCT_ID: '$productId',
+  REVENUE_QUANTITY: '$quantity',
+  REVENUE_PRICE: '$price',
+  REVENUE_REVENUE_TYPE: '$revenueType',
+
+  AMP_DEVICE_ID_PARAM: 'acai_device_id', // url param
+  AMP_REFERRER_PARAM: 'acai_referrer', // url param for overwriting the document.refer
+
+  REFERRER: 'referrer',
+  REFERRING_DOMAIN: 'referring_domain',
+
+  // UTM Params
+  UTM_SOURCE: 'utm_source',
+  UTM_MEDIUM: 'utm_medium',
+  UTM_CAMPAIGN: 'utm_campaign',
+  UTM_TERM: 'utm_term',
+  UTM_CONTENT: 'utm_content',
+
+  ATTRIBUTION_EVENT: '[Acai] Attribution Captured',
+
+  TRANSPORT_HTTP: 'http',
+  TRANSPORT_BEACON: 'beacon',
+};
