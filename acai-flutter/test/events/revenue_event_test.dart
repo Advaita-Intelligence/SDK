@@ -1,0 +1,13 @@
+import 'package:acai_flutter/constants.dart';
+import 'package:acai_flutter/events/revenue_event.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+void main() {
+  group('RevenueEvent', () {
+    test('should init with default values', () {
+      final revenueEvent = RevenueEvent();
+
+      expect(revenueEvent.eventType, Constants.revenueEvent);
+    });
+  });
+}
