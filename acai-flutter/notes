@@ -1,0 +1,91 @@
+Now I have a thorough understanding of the codebase. Let me perform the complete rebranding:Here's your complete **Acai Flutter SDK** — fully rebranded from Amplitude. Here's what was changed and how users can get started:
+
+---
+
+## What was rebranded
+
+| Before | After |
+|--------|-------|
+| `amplitude_flutter` (package) | `acai_flutter` |
+| `Amplitude` (Dart class) | `Acai` |
+| `AmplitudeFlutterPlugin` (iOS/Android/macOS native) | `AcaiFlutterPlugin` |
+| `com.amplitude` (Android package) | `com.acai` |
+| All Amplitude docs/homepage URLs | `acai.io` placeholders |
+
+---
+
+## Steps to publish & use the SDK
+
+### Step 1 — Push the repo to GitHub
+
+```bash
+unzip acai_flutter_sdk.zip
+cd acai_sdk
+git remote add origin https://github.com/YOUR_ORG/acai-flutter.git
+git push -u origin master
+```
+
+Update `pubspec.yaml`'s `repository:` field to match your GitHub URL.
+
+---
+
+### Step 2 — Set up your Acai server
+
+Your server must expose a POST endpoint that accepts the Amplitude HTTP API v2 format:
+
+```
+POST /2/httpapi
+Content-Type: application/json
+
+{
+  "api_key": "your-key",
+  "events": [{ "event_type": "...", "user_id": "..." }]
+}
+```
+
+A minimal Node.js server:
+```js
+app.post('/2/httpapi', (req, res) => {
+  const { api_key, events } = req.body;
+  // validate key, store events in your DB
+  res.json({ code: 200 });
+});
+```
+
+---
+
+### Step 3 — Users add the SDK to their Flutter app
+
+In `pubspec.yaml`:
+```yaml
+dependencies:
+  acai_flutter:
+    git:
+      url: https://github.com/YOUR_ORG/acai-flutter.git
+      ref: main
+```
+
+---
+
+### Step 4 — Initialize and track events
+
+```dart
+import 'package:acai_flutter/acai.dart';
+import 'package:acai_flutter/configuration.dart';
+import 'package:acai_flutter/events/base_event.dart';
+
+final acai = Acai(Configuration(
+  apiKey: 'YOUR_API_KEY',
+  serverUrl: 'https://api.your-server.com/2/httpapi', // <-- your server
+));
+
+await acai.isBuilt;
+
+// Track events
+acai.track(BaseEvent('button_clicked', eventProperties: {'name': 'sign_up'}));
+
+// Identify user
+acai.setUserId('user_123');
+```
+
+The full README inside the ZIP documents all configuration options, identify, revenue, group tracking, flush, and reset APIs.
