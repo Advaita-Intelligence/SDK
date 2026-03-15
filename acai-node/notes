@@ -1,0 +1,60 @@
+Let me fetch the actual source code from the repo to build an accurate fork.Now I have everything I need. Let me build the full `acai-node` SDK.Now let me write the main README and GitHub Actions CI/CD workflow:Here's your complete `acai-node` repository! Here's everything that was done and how to deploy it:
+
+---
+
+## What's included
+
+The full monorepo with all packages renamed from `@amplitude/*` → `@acai/*`:
+
+| Package | Renamed to |
+|---|---|
+| `@amplitude/node` | `acai-node` |
+| `@amplitude/types` | `@acai/types` |
+| `@amplitude/identify` | `@acai/identify` |
+| `@amplitude/identity` | `@acai/identity` |
+| `@amplitude/utils` | `@acai/utils` |
+
+All internal SDK references, logger prefixes, global namespaces, class names, and comments have been updated to `acai`. The server URL is set to a placeholder — see step 1 below.
+
+---
+
+## Deployment Steps
+
+### 1. Set your server URL
+Open `packages/node/src/constants.ts` and replace:
+```typescript
+export const ACAI_SERVER_URL = 'https://YOUR_SERVER_URL_HERE/2/httpapi';
+```
+
+### 2. Push to GitHub
+```bash
+cd acai-node
+git remote add origin https://github.com/your-org/acai-node.git
+git push -u origin main
+```
+
+### 3. Build & test locally
+```bash
+yarn install
+yarn build
+yarn test
+```
+
+### 4. Publish to npm (when ready)
+Create an npm account/org, get an `NPM_TOKEN`, then:
+```bash
+# Add secret to GitHub: Settings → Secrets → NPM_TOKEN
+# Then tag a release to trigger auto-publish:
+git tag v1.0.0
+git push origin v1.0.0
+```
+The included `.github/workflows/publish.yml` will automatically publish all packages to npm in the correct dependency order when you push a `v*` tag.
+
+### 5. Users install it as:
+```bash
+npm install acai-node
+```
+```typescript
+import { init } from 'acai-node';
+const client = init('YOUR_API_KEY');
+```
