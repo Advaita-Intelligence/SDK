@@ -1,0 +1,31 @@
+{
+  "name": "@acai/typescript",
+  "version": "1.0.0",
+  "description": "Typescript configuration used at Amplitude",
+  "repository": "git://github.com/your-org/acai-node.git",
+  "homepage": "https://github.com/your-org/acai-node/tree/main/packages/typescript",
+  "author": "Acai",
+  "license": "MIT",
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@acai/eslint-config-typescript": "^1.0.0",
+    "@typescript-eslint/eslint-plugin": "^2.30.0",
+    "@typescript-eslint/parser": "^2.30.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-config-standard-with-typescript": "^16.0.0",
+    "eslint-plugin-import": "^2.20.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1"
+  },
+  "peerDependencies": {
+    "eslint": "^7.0.0",
+    "typescript": "^4.9.5"
+  },
+  "scripts": {
+    "link:yarn": "yarn link"
+  }
+}

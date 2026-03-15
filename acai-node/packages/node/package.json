@@ -1,0 +1,55 @@
+{
+  "name": "acai-node",
+  "version": "1.0.0",
+  "description": "Offical Amplitude SDK for Node.js",
+  "repository": "git://github.com/your-org/acai-node.git",
+  "homepage": "https://github.com/your-org/acai-node",
+  "author": "Acai",
+  "license": "MIT",
+  "engines": {
+    "node": ">=10"
+  },
+  "main": "dist/src/index.js",
+  "module": "esm/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@acai/identify": "^1.0.0",
+    "@acai/types": "^1.0.0",
+    "@acai/utils": "^1.0.0",
+    "tslib": "^2.0.0"
+  },
+  "devDependencies": {
+    "@acai/eslint-config-typescript": "^1.0.0",
+    "@types/jest": "^26.0.14",
+    "@types/node": "^18.15.3",
+    "eslint": "^7.0.0",
+    "eslint-plugin-jest": "^24.1.5",
+    "jest": "^26.5.3",
+    "nock": "^13.0.4",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^1.17.0",
+    "rimraf": "^2.6.3",
+    "ts-jest": "^26.2.0",
+    "typescript": "^4.9.5"
+  },
+  "scripts": {
+    "build": "run-p build:es5 build:esm",
+    "build:es5": "tsc -p tsconfig.build.json",
+    "build:esm": "tsc -p tsconfig.esm.json",
+    "build:watch": "run-p build:watch:es5 build:watch:esm",
+    "build:watch:es5": "tsc -p tsconfig.build.json -w --preserveWatchOutput",
+    "build:watch:esm": "tsc -p tsconfig.esm.json -w --preserveWatchOutput",
+    "clean": "rimraf dist coverage",
+    "lint": "run-s lint:prettier lint:eslint",
+    "lint:prettier": "prettier --check \"{src,test}/**/*.ts\"",
+    "lint:eslint": "eslint '{src,test}/**/*.ts'",
+    "fix": "run-s fix:eslint fix:prettier",
+    "fix:prettier": "prettier --write \"{src,test}/**/*.ts\"",
+    "fix:eslint": "yarn lint:eslint --fix",
+    "link:yarn": "yarn link",
+    "test": "jest"
+  }
+}
