@@ -1,0 +1,24 @@
+name: acai_flutter_example
+description: Demonstrates how to use the acai_flutter plugin.
+publish_to: 'none'
+
+environment:
+  sdk: ">=3.3.0 < 4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  acai_flutter:
+    path: ../
+
+flutter:
+  uses-material-design: true
+
+version: 1.0.0+1
