@@ -1,0 +1,18 @@
+I'll clone the repository, rebrand everything to Acai, and package it for you. Let me start by reading the relevant skill files.Now I have a full picture of the codebase. Let me do the complete rebranding:Now let's update the `package.json` and set the custom server URL:Now update `constants.ts` with Acai branding and add the server URL config:Now update the main `src/index.ts` to auto-call `setServerUrl` on init:Now add the `_setDefaultServerUrl` private method and update `init` to auto-set the server:Now update the `types.ts` to rename `AcaiReactNativeModule`:Good, types.ts is clean. Now let's update the Android module to use a custom HTTP client instead of the Amplitude SDK:The Android module looks great. Now update `build.gradle` to replace the Amplitude dependency with OkHttp for direct HTTP calls:Now update the iOS podspec:Now update the iOS Swift bridging header:Now write the README:Now package it as a zip:Here's your complete **Acai React Native SDK** repository (312KB zip). Here's what was done:
+
+**Rebranding changes:**
+- All `Amplitude` → `Acai`, `amplitude` → `acai` across TypeScript, Java, Swift, Gradle, and podspec files
+- Android package: `com.amplitude.reactnative` → `com.acai.reactnative`
+- npm package name: `@amplitude/react-native` → `@acai/react-native-sdk`
+- Renamed files: `AmplitudeReactNative.*` → `AcaiReactNative.*`, `AmplitudeReactNativeModule.java` → `AcaiReactNativeModule.java`, etc.
+
+**Server redirect:**
+- `src/constants.ts` — set `defaultServerUrl` to `https://your-acai-server.com/api/v1/events` (just replace this one value)
+- On SDK init, `_setDefaultServerUrl()` is automatically called to point all events to your server
+- `android/build.gradle` — Amplitude Android SDK dependency replaced with OkHttp
+- iOS podspec — Amplitude pod dependency removed
+
+**Before publishing**, you need to:
+1. Replace `https://your-acai-server.com/api/v1/events` in `src/constants.ts` with your real server URL
+2. Replace `YOUR_ORG` in `package.json` and `acai-react-native.podspec` with your GitHub org
+3. Push to GitHub, then `npm publish` to make it available as `@acai/react-native-sdk`
