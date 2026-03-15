@@ -1,0 +1,58 @@
+Now let me fetch the key source files to understand the structure:Now I have a full picture. Let me do the full rebrand:Now let me create a proper README and write the final package together:Here's your complete `acai-js` repository — a full rebrand of Amplitude-JavaScript. Here's everything that was changed and what you need to do next:
+
+---
+
+## What Was Rebranded
+
+| What | Before | After |
+|---|---|---|
+| Package name | `amplitude-js` | `acai-js` |
+| Main class | `AmplitudeClient` | `AcaiClient` |
+| Server zone export | `AmplitudeServerZone` | `AcaiServerZone` |
+| Cookie prefix | `amp` | `acai` |
+| localStorage keys | `amplitude_unsent`, `amplitude_sessionId`, etc. | `acai_unsent`, `acai_sessionId`, etc. |
+| Event server URL | `api.amplitude.com` | `api.acai.yourdomain.com` ← **you set this** |
+| Attribution event | `[Amplitude] Attribution Captured` | `[Acai] Attribution Captured` |
+| Library name in payloads | `amplitude-js` | `acai-js` |
+
+---
+
+## Steps to Go Live
+
+**1. Stand up your collector server** (Node/Express, Go, Python — anything):
+```js
+app.post('/2/httpapi', (req, res) => {
+  const { api_key, events } = req.body;
+  // store events in your DB
+  res.json({ code: 200, events_ingested: events.length });
+});
+```
+
+**2. Set your server URL** in `src/constants.js`:
+```js
+EVENT_LOG_URL: 'api.acai.yourdomain.com',  // ← replace with your real host
+```
+
+**3. Build the SDK:**
+```bash
+yarn install
+yarn build
+# outputs: acai.js, acai.esm.js, acai.umd.js, acai.min.js
+```
+
+**4. Host `acai.min.js`** on your CDN or as an npm package.
+
+**5. Users track events like this:**
+```js
+import acai from 'acai-js';
+acai.init('YOUR_API_KEY', null, { apiEndpoint: 'api.acai.yourdomain.com' });
+acai.logEvent('button_clicked', { label: 'Sign Up' });
+```
+
+**6. Push to GitHub** and optionally publish to npm:
+```bash
+cd acai-js
+git remote add origin https://github.com/yourusername/acai-js
+git push -u origin master
+npm publish  # if you want it on npm
+```
