@@ -1,0 +1,47 @@
+I'll start by reading the skill files and then clone/rebrand the repository systematically.Now I have a clear picture. Let me run a comprehensive rebranding script:Zero remaining references. Now let's update the README, create the ingest server, and update key config files:Now write a comprehensive README:Now create a complete, production-ready ingest server:Now update the root `package.json` and create a setup script:Zero references. Now let's package it up:Here's what was done and how to get started:
+
+---
+
+## 🫐 Acai-TypeScript — What's Inside
+
+**1,678 files rebranded — 0 remaining Amplitude references.**
+
+### What was changed
+- All `@amplitude/*` package names → `@acai/*` (browser, node, react-native, all plugins)
+- All server URLs → `https://events.acai.yourdomain.com/2/httpapi`
+- All internal constants (`AMPLITUDE_PREFIX`, `AMPLITUDE_SERVER_URL`, `__AMPLITUDE_MESSENGER__`, etc.) → `ACAI_*`
+- Storage prefix changed from `AMP_` → `ACAI_`
+- All READMEs, examples, test files, config files rebranded
+
+### New files added
+- **`ingest-server/`** — A complete TypeScript ingest server with:
+  - `/2/httpapi` and `/batch` endpoints (SDK-compatible)
+  - API key validation
+  - Pluggable storage (swap in Postgres, ClickHouse, Kafka)
+  - Optional admin debug route
+  - Docker-ready
+- **`setup.sh`** — One-command setup for new contributors
+
+---
+
+### Getting started (after downloading)
+
+```bash
+unzip Acai-TypeScript.zip && cd Acai-TypeScript
+
+# 1. Build the SDK
+nvm use && yarn install && yarn build
+
+# 2. Start your ingest server
+cd ingest-server
+cp .env.example .env         # Set ACAI_API_KEY=your_key
+npm install && npm run dev
+
+# 3. In your app
+npm install @acai/analytics-browser
+
+acai.init('your_key', { serverUrl: 'http://localhost:3000/2/httpapi' });
+acai.track('Hello World');
+```
+
+> Replace `events.acai.yourdomain.com` with your real domain in `packages/analytics-core/src/types/constants.ts` before publishing to npm.
