@@ -1,0 +1,74 @@
+group 'com.acai.acai_flutter'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    ext.kotlin_version = '1.9.22'
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.2.2'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+rootProject.allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+
+android {
+    compileSdkVersion 34
+    // Condition for namespace compatibility in AGP 8
+    if (project.android.hasProperty("namespace")) {
+        namespace 'com.acai.acai_flutter'
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+    defaultConfig {
+        minSdkVersion 16
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+}
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.6.10"
+
+    // Locked to specific version to prevent binary compatibility issues.
+    // Version range [1.22,2.0) previously caused NoSuchMethodError when Gradle
+    // resolved different versions at compile-time vs runtime (see #283).
+    implementation 'com.acai:analytics-android:1.25.3'
+    testImplementation 'org.mockito:mockito-core:4.0.0'
+    testImplementation "io.mockk:mockk:1.12.4"
+    testImplementation "io.mockk:mockk-agent-jvm:1.11.0"
+    testImplementation('junit:junit:4.13')
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.7.2")
+    testImplementation 'org.robolectric:robolectric:4.8.2'
+}
+
+tasks.withType(Test) {
+    useJUnitPlatform()
+    testLogging {
+        showStandardStreams = true
+    }
+}
+
+kotlin {
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+        kotlinOptions {
+            jvmTarget = "1.8"
+        }
+    }
+}

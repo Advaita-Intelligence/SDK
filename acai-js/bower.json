@@ -1,0 +1,29 @@
+{
+  "name": "acai-js",
+  "description": "Javascript library for Acai Analytics",
+  "main": "acai.umd.js",
+  "authors": [
+    "Acai <support@acaiplatform.ai>"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "analytics",
+    "acai"
+  ],
+  "homepage": "https://clickstream.acaiplatform.ai",
+  "ignore": [
+    "**/.*",
+    "Makefile",
+    "circle.yml",
+    "build",
+    "components",
+    "dist",
+    "karma.conf.js",
+    "node_modules",
+    "scripts",
+    "package-lock.json",
+    "webpack.*.js",
+    "bower_components",
+    "test"
+  ]
+}

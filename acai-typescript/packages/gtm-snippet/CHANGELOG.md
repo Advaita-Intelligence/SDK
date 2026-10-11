@@ -1,0 +1,300 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [2.35.4](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.35.3...@acai/gtm-snippet@2.35.4) (2026-02-26)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+## [2.35.3](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.35.2...@acai/gtm-snippet@2.35.3) (2026-02-24)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+## [2.35.2](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.35.1...@acai/gtm-snippet@2.35.2) (2026-02-20)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+## [2.35.1](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.34.2...@acai/gtm-snippet@2.35.1) (2026-02-19)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+# [2.35.0](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.35.0...@acai/gtm-snippet@2.35.0) (2026-02-17)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+## [2.34.1](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.34.1...@acai/gtm-snippet@2.34.1) (2026-02-11)
+
+
+### Features
+
+* **gtm-snippet:** update GTM package's engagement sdk snippet to support split bun… ([#1528](https://github.com/YOUR_USERNAME/Acai-TypeScript/issues/1528)) ([ce5da08](https://github.com/YOUR_USERNAME/Acai-TypeScript/commit/ce5da08398a9cbaa468217d36e73a5f9eefcdb32))
+
+
+
+
+
+## [2.34.1](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.33.6...@acai/gtm-snippet@2.34.1) (2026-02-10)
+
+
+### Bug Fixes
+
+* **analytics-browser:** defer session_start and attribution when optOut is "true" ([#1509](https://github.com/YOUR_USERNAME/Acai-TypeScript/issues/1509)) ([3a3818d](https://github.com/YOUR_USERNAME/Acai-TypeScript/commit/3a3818d19bd84e4aa8405e10f8538886dd647f38))
+
+
+
+
+
+# [2.34.0](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.33.5...@acai/gtm-snippet@2.34.0) (2026-01-26)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+## [2.33.5](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.33.4...@acai/gtm-snippet@2.33.5) (2026-01-21)
+
+
+### Bug Fixes
+
+* **analytics-browser:** ignore right clicks when tracking dead clicks ([#1496](https://github.com/YOUR_USERNAME/Acai-TypeScript/issues/1496)) ([752b4c0](https://github.com/YOUR_USERNAME/Acai-TypeScript/commit/752b4c0d9f22fcaa4b920b6fff09455a58f92da2))
+
+
+
+
+
+## [2.33.4](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.33.3...@acai/gtm-snippet@2.33.4) (2026-01-15)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+## [2.33.3](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.33.2...@acai/gtm-snippet@2.33.3) (2026-01-14)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+## [2.33.2](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.33.1...@acai/gtm-snippet@2.33.2) (2026-01-14)
+
+
+### Bug Fixes
+
+* **deps:** bump node-forge from 1.3.1 to 1.3.3 in /packages/analytics-browser/playground/react-spa ([#1438](https://github.com/YOUR_USERNAME/Acai-TypeScript/issues/1438)) ([ffacc88](https://github.com/YOUR_USERNAME/Acai-TypeScript/commit/ffacc8888217249e6c8084ef7327872e1fa375ca))
+
+
+
+
+
+## [2.33.1](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.32.3...@acai/gtm-snippet@2.33.1) (2025-12-30)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+# [2.33.0](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.32.3...@acai/gtm-snippet@2.33.0) (2025-12-30)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+# [2.33.0](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.32.2...@acai/gtm-snippet@2.33.0) (2025-12-24)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+## [2.32.2](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.32.2...@acai/gtm-snippet@2.32.2) (2025-12-22)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+## [2.32.2](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.32.1...@acai/gtm-snippet@2.32.2) (2025-12-16)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+## [2.32.1](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.31.5...@acai/gtm-snippet@2.32.1) (2025-12-12)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+# [2.32.0](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.31.4...@acai/gtm-snippet@2.32.0) (2025-12-09)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+## [2.31.4](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.31.3...@acai/gtm-snippet@2.31.4) (2025-12-08)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+## [2.31.3](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.31.3...@acai/gtm-snippet@2.31.3) (2025-12-05)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+## [2.31.3](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.31.2...@acai/gtm-snippet@2.31.3) (2025-11-21)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+## [2.31.2](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.31.1...@acai/gtm-snippet@2.31.2) (2025-11-20)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+## [2.31.1](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.30.2...@acai/gtm-snippet@2.31.1) (2025-11-17)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+# [2.31.0](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.30.1...@acai/gtm-snippet@2.31.0) (2025-11-17)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+## [2.30.1](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.29.1...@acai/gtm-snippet@2.30.1) (2025-11-05)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+# [2.30.0](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.28.1...@acai/gtm-snippet@2.30.0) (2025-10-29)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+# [2.29.0](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.27.2...@acai/gtm-snippet@2.29.0) (2025-10-23)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+# [2.28.0](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.27.1...@acai/gtm-snippet@2.28.0) (2025-10-23)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+## [2.27.1](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.26.3...@acai/gtm-snippet@2.27.1) (2025-10-21)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+# [2.27.0](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.26.2...@acai/gtm-snippet@2.27.0) (2025-10-17)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+## [2.26.2](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.26.1...@acai/gtm-snippet@2.26.2) (2025-10-15)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+## [2.26.1](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.25.5...@acai/gtm-snippet@2.26.1) (2025-10-14)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+# [2.26.0](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.25.4...@acai/gtm-snippet@2.26.0) (2025-10-14)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+## [2.25.4](https://github.com/YOUR_USERNAME/Acai-TypeScript/compare/@acai/gtm-snippet@2.25.3...@acai/gtm-snippet@2.25.4) (2025-10-07)
+
+**Note:** Version bump only for package @acai/gtm-snippet
+
+
+
+
+
+## 2.25.3 (2025-10-06)
+
+**Note:** Version bump only for package @acai/gtm-snippet

@@ -1,0 +1,4 @@
+{
+  "extends": "@acai/eslint-config-typescript",
+  "ignorePatterns": ["jest.config.js", "/dist", "/esm"]
+}

@@ -1,0 +1,7 @@
+# CODEOWNERS file for Acai TypeScript repository
+# This file defines code ownership for different parts of the repository.
+# When a pull request is opened that modifies files matching these patterns,
+# the specified teams/individuals will automatically be requested for review.
+#
+# More info: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+

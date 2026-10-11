@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>cookie isEnabled</title>
+</head>
+<body>
+  <pre id="out"></pre>
+  <script type="module">
+    import { CookieStorage } from '@acai/analytics-core';
+
+    const out = document.getElementById('out');
+
+    function log(msg) {
+      out.textContent += msg + '\n';
+    }
+
+    async function run() {
+      const promises = [];
+
+      // call isEnabled many times concurrently to stress test the re-entrancy issue
+      // that was fixed by fixed by https://github.com/YOUR_USERNAME/Acai-TypeScript/pull/1539
+      const RUNS = 100;
+      for (let i = 0; i < RUNS; i++) {
+        const c = new CookieStorage();
+        promises.push(c.isEnabled());
+      }
+
+      const results = await Promise.all(promises);
+
+      log(`All ${RUNS} calls to CookieStorage.prototype.isEnabled returned true: ${results.every((result) => result === true)}`);
+
+      // Assert that all of the concurrent calls returned true
+      for (const result of results) {
+        if (!result) {
+          const errorMessage = `isEnabled returned 'false'. Test failed.`;
+          console.error(errorMessage);
+          throw new Error(errorMessage);
+        }
+      }
+    }
+
+    run();
+  </script>
+</body>
+</html>

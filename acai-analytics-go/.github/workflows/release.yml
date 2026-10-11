@@ -1,0 +1,93 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      packageVersion:
+        description: "The version to publish (patch, minor, current)"
+        required: true
+      dryRun:
+        description: "Do a dry run to preview instead of a real release (true/false)"
+        required: true
+        default: "true"
+
+permissions:
+  contents: write
+
+jobs:
+  authorize:
+    name: Authorize
+    runs-on: ubuntu-latest
+    steps:
+      - name: ${{ github.actor }} permission check to do a release
+        uses: "lannonbr/repo-permission-check-action@2.0.2"
+        with:
+          permission: "write"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    needs: [authorize]
+
+    steps:
+      - name: Checkout for ${{ github.event.inputs.dryRun != 'false' && 'dry run' || 'PRODUCTION RELEASE' }}
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ssh-key: ${{ secrets.SSH_DEPLOY_KEY }}
+
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '>=1.17'
+          cache: true
+
+      - name: Run tests
+        run: go test -v ./...
+
+      - name: Get new version
+        id: new_version
+        uses: anothrNick/github-tag-action@1.55.0
+        if: ${{ github.event.inputs.packageVersion != 'current' }}
+        env:
+          DRY_RUN: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: false
+          DEFAULT_BUMP: ${{ github.event.inputs.packageVersion }}
+
+      - name: Configure Git User
+        run: |
+          git config user.name "$GITHUB_ACTOR"
+          git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
+
+      - name: Update SdkVersion in constants.go
+        if: ${{ github.event.inputs.packageVersion != 'current' }}
+        run: |
+          sed -i -e 's/\(SdkVersion\s*=\s*\)"[^"]*"/\1"${{ steps.new_version.outputs.new_tag }}"/' ./acai/constants/constants.go
+          git commit -am "v${{ steps.new_version.outputs.new_tag }}"
+
+      - name: Create version tag
+        if: ${{ github.event.inputs.packageVersion != 'current' }}
+        run: |
+          git tag "v${{ steps.new_version.outputs.new_tag }}"
+
+      - name: Push Git changes
+        if: ${{ github.event.inputs.packageVersion != 'current' && github.event.inputs.dryRun == 'false' }}
+        run: |
+          git push
+          git push --tags
+
+      - name: Release version
+        if: ${{ github.event.inputs.dryRun == 'false' }}
+        uses: goreleaser/goreleaser-action@v4
+        with:
+          version: latest
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update Go Module Index
+        if: ${{ github.event.inputs.dryRun == 'false' }}
+        run: curl "https://proxy.golang.org/github.com/acaiplatform/analytics-go/@v/$(git describe HEAD --tags --abbrev=0).info"

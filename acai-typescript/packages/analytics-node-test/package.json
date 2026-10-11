@@ -1,0 +1,25 @@
+{
+  "name": "@acai/analytics-node-test",
+  "version": "1.0.13",
+  "private": true,
+  "description": "",
+  "author": "Acai Inc",
+  "homepage": "https://github.com/YOUR_USERNAME/Acai-TypeScript",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YOUR_USERNAME/Acai-TypeScript.git"
+  },
+  "scripts": {
+    "test": "jest -i"
+  },
+  "bugs": {
+    "url": "https://github.com/YOUR_USERNAME/Acai-TypeScript/issues"
+  },
+  "dependencies": {
+    "@acai/analytics-node": "workspace:*"
+  },
+  "devDependencies": {
+    "@acai/analytics-core": "workspace:*",
+    "nock": "^13.2.4"
+  }
+}

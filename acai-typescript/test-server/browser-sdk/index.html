@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Browser SDK Test</title>
+  </head>
+  <body>
+    <div id="app">
+      Basic test page for the Acai Browser SDK
+      <button id="clearCookies" style="margin-top: 10px;">Clear Acai Cookies</button>
+    </div>
+    <script type="module">
+      import * as acai from '@acai/analytics-browser';
+      import { stubPlugin } from '@acai/plugin-stub-browser';
+      window.acai = acai;
+      acai.add(stubPlugin());
+      acai.init(
+        import.meta.env.VITE_ACAI_API_KEY,
+        import.meta.env.VITE_ACAI_USER_ID || 'acai-typescript test user',
+        {
+          autocapture: {
+            // networkTracking: true,
+            networkTracking: {
+              ignoreAcaißRequests: false,
+              ignoreHosts: [],
+              captureRules: [
+                {hosts: ['*.acai.yourdomain.com'], statusCodeRange: '400-599'},
+                {hosts: ['httpstat.us'], statusCodeRange: '400-599'},
+              ],
+            },
+          },
+        }
+      );
+
+      // Add cookie clearing functionality
+      document.getElementById('clearCookies').addEventListener('click', async () => {
+        try {
+          const cookies = await cookieStore.getAll();
+          const acaiCookies = cookies.filter(cookie => cookie.name.startsWith('AMP_'));
+          
+          await Promise.all(
+            acaiCookies.map(cookie => 
+              cookieStore.delete(cookie.name)
+            )
+          );
+          
+          alert('Acai cookies cleared!');
+        } catch (error) {
+          console.error('Error clearing cookies:', error);
+          alert('Failed to clear cookies. See console for details.');
+        }
+      });
+    </script>
+  </body>
+</html>

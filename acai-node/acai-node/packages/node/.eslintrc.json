@@ -1,0 +1,8 @@
+{
+  "extends": ["@acai/eslint-config-typescript", "plugin:jest/recommended"],
+  "plugins": ["jest"],
+  "ignorePatterns": ["jest.config.js", "/dist", "/esm"],
+  "env": {
+    "jest/globals": true
+  }
+}

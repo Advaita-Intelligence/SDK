@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig",
+  "exclude": ["example"],
+  "typedocOptions": {
+    "entryPoints": ["./src/index.ts"],
+    "exclude": ["./src/__tests__/**/*"],
+    "excludePrivate": true,
+    "readme": "README.md",
+    "disableSources": true
+  }
+}
